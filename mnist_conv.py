@@ -1,7 +1,7 @@
 import json
 import os
 import time
-#provino1 prova da server
+#provino1 prova da server angelo
 import torch
 import torch.nn as nn
 import torch.optim as optim
