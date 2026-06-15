@@ -20,3 +20,17 @@ print(np.unique(y))
 
 print("\nNumero classi (escluso sfondo):")
 print(len(np.unique(y)) - 1)
+
+print("\nDistribuzione classi:")
+
+unique, counts = np.unique(y, return_counts=True)
+
+for cls, count in zip(unique, counts):
+    print(f"Classe {cls}: {count} pixel")
+
+
+print("\nNumero pixel etichettati:")
+print(np.sum(y > 0))
+
+print("\nPercentuale pixel etichettati:")
+print(np.sum(y > 0) / y.size * 100)
