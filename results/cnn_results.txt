@@ -1,0 +1,15 @@
+Dataset: Indian Pines
+Modello: CNN baseline
+Accuracy: 99.90%
+Epoche: 20
+Batch size: 64
+Learning rate: 0.001
+Patch size: 9x9
+Label smoothing: 0.1
+Seed: 42
+Device: cpu
+Parametri: 453456
+
+Note:
+Train/test split casuale sui pixel.
+Possibile presenza di spatial leakage.

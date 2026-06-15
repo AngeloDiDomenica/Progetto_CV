@@ -219,3 +219,62 @@ CPU
 
 Accuracy:
 90.29%
+
+
+## Patch Extraction
+
+Obiettivo:
+
+Aggiungere informazione spaziale oltre a quella spettrale.
+
+### Parametri
+
+Patch size: 9x9
+
+Padding: 4 pixel per lato
+
+### Risultato
+
+Input originale:
+
+(145,145,200)
+
+Dataset con padding:
+
+(153,153,200)
+
+Dataset finale:
+
+X_patches.shape = (10249,9,9,200)
+
+y_patches.shape = (10249,)
+
+### Salvataggio
+
+Sono stati creati:
+
+X_patches.npy
+
+y_patches.npy
+
+Ogni campione rappresenta una patch 9×9 centrata su un pixel etichettato.
+
+
+| Esperimento | Input   | Accuracy |
+| ----------- | ------- | -------- |
+| MLP         | 200     | 90.29%   |
+| CNN         | 9×9×200 | ?        |
+| Conv-KAN    | 9×9×200 | ?        |
+
+
+## Stato attuale
+
+* [x] Download dataset
+* [x] Analisi struttura dati
+* [x] Analisi distribuzione classi
+* [x] Preprocessing pixel-wise
+* [x] Baseline MLP
+* [x] Patch extraction
+* [ ] CNN baseline
+* [ ] Conv-KAN
+* [ ] Analisi finale

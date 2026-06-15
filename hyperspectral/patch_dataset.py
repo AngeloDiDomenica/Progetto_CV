@@ -80,3 +80,10 @@ print(X_patches[0].shape)
 
 print("\nClasse prima patch:")
 print(y_patches[0])
+
+
+np.save("X_patches.npy", X_patches)
+
+np.save("y_patches.npy", y_patches)
+
+print("\nDataset salvato.")
