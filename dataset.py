@@ -143,41 +143,74 @@ def prepare_data(
     random_state=42
 ):
     """
-    Pipeline completa.
+    Pipeline corretta senza spatial leakage:
+    1. PCA
+    2. pixel split (prima delle patch)
+    3. patch separati per train/test
     """
 
-    X, y = load_indian_pines(
-        data_path,
-        gt_path
+    # 1. LOAD
+    X, y = load_indian_pines(data_path, gt_path)
+
+    # 2. PCA
+    X = apply_pca(X, n_components=pca_components)
+
+    h, w, c = X.shape
+
+    # 3. flatten pixel-wise
+    X_pixels = X.reshape(-1, c)
+    y_pixels = y.reshape(-1)
+
+    # rimuovi background
+    mask = y_pixels != 0
+    X_pixels = X_pixels[mask]
+    y_pixels = y_pixels[mask]
+
+    # 4. SPLIT PRIMA DELLE PATCH (FONDAMENTALE)
+    X_train_pix, X_test_pix, y_train_pix, y_test_pix = train_test_split(
+        X_pixels,
+        y_pixels,
+        test_size=test_size,
+        random_state=random_state,
+        stratify=y_pixels
     )
 
-    X = apply_pca(
-        X,
-        n_components=pca_components
-    )
+    # 5. ricostruzione immagini parziali (per patch extraction)
+    X_train_img = np.zeros((h, w, c))
+    X_test_img = np.zeros((h, w, c))
 
-    X, y = create_patches(
-        X,
-        y,
+    y_train_img = np.zeros((h, w))
+    y_test_img = np.zeros((h, w))
+
+    idx = 0
+
+    # ricostruzione train
+    for i in range(h):
+        for j in range(w):
+            if y[i, j] != 0:
+                if idx < len(y_train_pix):
+                    X_train_img[i, j] = X[i, j]
+                    y_train_img[i, j] = y[i, j]
+                else:
+                    X_test_img[i, j] = X[i, j]
+                    y_test_img[i, j] = y[i, j]
+                idx += 1
+
+    # 6. PATCH SEPARATE
+    X_train, y_train = create_patches(
+        X_train_img,
+        y_train_img,
         window_size=window_size
     )
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=test_size,
-        random_state=random_state,
-        stratify=y
+    X_test, y_test = create_patches(
+        X_test_img,
+        y_test_img,
+        window_size=window_size
     )
 
-    train_dataset = HSIDataset(
-        X_train,
-        y_train
-    )
-
-    test_dataset = HSIDataset(
-        X_test,
-        y_test
-    )
+    # 7. DATASET
+    train_dataset = HSIDataset(X_train, y_train)
+    test_dataset = HSIDataset(X_test, y_test)
 
     return train_dataset, test_dataset

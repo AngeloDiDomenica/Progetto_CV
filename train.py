@@ -9,7 +9,21 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "hyperspectral")
 
+def train_accuracy(model, loader, device):
+    model.eval()
+    correct = 0
+    total = 0
 
+    with torch.no_grad():
+        for x, y in loader:
+            x, y = x.to(device), y.to(device)
+            out = model(x)
+            preds = torch.argmax(out, dim=1)
+
+            correct += (preds == y).sum().item()
+            total += y.size(0)
+
+    return correct / total
 def evaluate(model, loader, device):
     model.eval()
 
@@ -33,18 +47,20 @@ def evaluate(model, loader, device):
 def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("DEVICE:", device)
+    print("CUDA AVAILABLE:", torch.cuda.is_available())
 
     # 1. DATA
     train_dataset, test_dataset = prepare_data(
     os.path.join(DATA_DIR, "Indian_pines_corrected.mat"),
     os.path.join(DATA_DIR, "Indian_pines_gt.mat"),
-    window_size=10,
-    pca_components=15
+    window_size=25,
+    pca_components=50
 )
 
     train_loader = DataLoader(
         train_dataset,
-        batch_size=32,
+        batch_size=64,
         shuffle=True
     )
 
@@ -62,7 +78,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     # 4. TRAIN LOOP
-    epochs = 2
+    epochs = 10
 
     for epoch in range(epochs):
 
@@ -83,12 +99,13 @@ def main():
             optimizer.step()
 
             running_loss += loss.item()
-
+        train_acc = train_accuracy(model, train_loader, device)
         acc = evaluate(model, test_loader, device)
 
         print(
             f"Epoch [{epoch+1}/{epochs}] "
             f"Loss: {running_loss/len(train_loader):.4f} "
+            f"Train Acc: {train_acc:.4f} "
             f"Test Acc: {acc:.4f}"
         )
 
