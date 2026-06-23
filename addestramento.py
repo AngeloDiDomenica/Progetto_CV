@@ -21,11 +21,11 @@ from models.baselines.conv_wavkan_baseline import SimpleConvWavKAN
 # PARAMETRI
 # =====================
 
-MODEL_NAME = "baseline"
+MODEL_NAME = "cnn"
 
 VALID_MODELS = [
 
-    "baseline",
+    "cnn",
 
     "kagn",
 
@@ -37,7 +37,7 @@ BATCH_SIZE = 64
 
 LEARNING_RATE = 0.003
 
-EPOCHS = 1
+EPOCHS = 10
 
 INPUT_CHANNELS = 200
 
@@ -82,7 +82,7 @@ if torch.cuda.is_available():
 # DATALOADER
 # =====================
 
-train_loader, test_loader = get_dataloaders(
+train_loader, val_loader, test_loader = get_dataloaders(
 
     batch_size=BATCH_SIZE
 
@@ -102,7 +102,7 @@ print("\nDevice:", device)
 
 print("Torch:", torch.__version__)
 
-if MODEL_NAME == "baseline":
+if MODEL_NAME == "cnn":
 
     model = SimpleConv(
 
@@ -175,7 +175,7 @@ optimizer = torch.optim.Adam(
 # TRAINING
 # =====================
 
-for epoch in range(epochs):
+for epoch in range(EPOCHS):
 
     model.train()
 
@@ -205,11 +205,47 @@ for epoch in range(epochs):
     avg_loss = running_loss / len(train_loader)
 
     print(
-        f"Epoch {epoch+1}/{epochs}"
+        f"Epoch {epoch+1}/{EPOCHS}"
         f" Loss: {avg_loss:.4f}"
     )
     
+    # =====================
+    # VALIDATION
+    # =====================
 
+    model.eval()
+
+    val_correct = 0
+
+    val_total = 0
+
+    with torch.no_grad():
+
+        for batch_x, batch_y in val_loader:
+
+            batch_x = batch_x.to(device)
+
+            batch_y = batch_y.to(device)
+
+            outputs = model(batch_x)
+
+            predictions = outputs.argmax(1)
+
+            val_total += batch_y.size(0)
+
+            val_correct += (
+
+                predictions == batch_y
+
+            ).sum().item()
+
+    val_accuracy = val_correct / val_total
+
+    print(
+
+        f"Validation Accuracy: {val_accuracy*100:.2f}%"
+
+    )
 
 # =====================
 # TEST
@@ -275,7 +311,9 @@ with open(results_dir / f"{MODEL_NAME}_results.txt", "w") as f:
 
     f.write("\nNote:\n")
 
-    f.write("Train/test split casuale sui pixel.\n")
+    f.write("Split: 70% Train - 10% Validation - 20% Test.\n")
+
+    f.write("Suddivisione stratificata sui pixel.\n")
 
     f.write("Possibile presenza di spatial leakage.\n")
 

@@ -41,10 +41,10 @@ def get_dataloaders(batch_size=64):
     y = y - 1
 
     # =====================
-    # TRAIN TEST SPLIT
+    # TRAIN / VALIDATION / TEST SPLIT
     # =====================
 
-    X_train, X_test, y_train, y_test = train_test_split(
+    X_temp, X_test, y_temp, y_test = train_test_split(
 
         X,
 
@@ -58,29 +58,73 @@ def get_dataloaders(batch_size=64):
 
     )
 
+    X_train, X_val, y_train, y_val = train_test_split(
+
+        X_temp,
+
+        y_temp,
+
+        test_size=0.125,
+
+        random_state=42,
+
+        stratify=y_temp
+
+    )
+
+    print("\nTrain:", X_train.shape)
+
+    print("Validation:", X_val.shape)
+
+    print("Test:", X_test.shape)
+
     # =====================
     # NORMALIZZAZIONE
     # =====================
 
     N_train = X_train.shape[0]
 
+    N_val = X_val.shape[0]
+
     N_test = X_test.shape[0]
+
 
     X_train_flat = X_train.reshape(N_train, -1)
 
+    X_val_flat = X_val.reshape(N_val, -1)
+
     X_test_flat = X_test.reshape(N_test, -1)
+
 
     scaler = StandardScaler()
 
     X_train_flat = scaler.fit_transform(X_train_flat)
 
+    X_val_flat = scaler.transform(X_val_flat)
+
     X_test_flat = scaler.transform(X_test_flat)
+
 
     X_train = X_train_flat.reshape(
 
         N_train,
+
         CHANNELS,
+
         PATCH_SIZE,
+
+        PATCH_SIZE
+
+    )
+
+    X_val = X_val_flat.reshape(
+
+        N_val,
+
+        CHANNELS,
+
+        PATCH_SIZE,
+
         PATCH_SIZE
 
     )
@@ -88,12 +132,14 @@ def get_dataloaders(batch_size=64):
     X_test = X_test_flat.reshape(
 
         N_test,
+
         CHANNELS,
+
         PATCH_SIZE,
+
         PATCH_SIZE
 
     )
-
     # =====================
     # PYTORCH
     # =====================
@@ -101,6 +147,14 @@ def get_dataloaders(batch_size=64):
     X_train = torch.tensor(
 
         X_train,
+
+        dtype=torch.float32
+
+    )
+
+    X_val = torch.tensor(
+
+        X_val,
 
         dtype=torch.float32
 
@@ -122,6 +176,14 @@ def get_dataloaders(batch_size=64):
 
     )
 
+    y_val = torch.tensor(
+
+        y_val,
+
+        dtype=torch.long
+
+    )
+
     y_test = torch.tensor(
 
         y_test,
@@ -135,6 +197,14 @@ def get_dataloaders(batch_size=64):
         X_train,
 
         y_train
+
+    )
+
+    val_dataset = TensorDataset(
+
+        X_val,
+
+        y_val
 
     )
 
@@ -156,6 +226,16 @@ def get_dataloaders(batch_size=64):
 
     )
 
+    val_loader = DataLoader(
+
+        val_dataset,
+
+        batch_size=batch_size,
+
+        shuffle=False
+
+    )
+
     test_loader = DataLoader(
 
         test_dataset,
@@ -166,4 +246,4 @@ def get_dataloaders(batch_size=64):
 
     )
 
-    return train_loader, test_loader
+    return train_loader, val_loader, test_loader

@@ -15,7 +15,7 @@ HALF = PATCH_SIZE // 2
 # CARICAMENTO DATI
 # =====================
 
-data = loadmat(BASE_DIR / "Indian_pines_corrected (1).mat")
+data = loadmat(BASE_DIR / "Indian_pines_corrected.mat")
 
 labels = loadmat(BASE_DIR / "Indian_pines_gt.mat")
 
