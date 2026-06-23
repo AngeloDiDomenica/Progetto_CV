@@ -1,50 +1,71 @@
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+import sys
 
-from models.baselines.conv_baseline import SimpleConv
-from models.baselines.conv_kagn_baseline import SimpleConvKAGN
-from models.baselines.conv_wavkan_baseline import SimpleConvWavKAN
+import numpy as np
 
 import torch
-from torch.utils.data import TensorDataset, DataLoader
 
 import torch.nn as nn
 
 from pathlib import Path
 
+from hyperspectral.dataset_loader import get_dataloaders
+
+from models.baselines.conv_baseline import SimpleConv
+
+from models.baselines.conv_kagn_baseline import SimpleConvKAGN
+
+from models.baselines.conv_wavkan_baseline import SimpleConvWavKAN
+
+
+# =====================
+# PARAMETRI
+# =====================
+
 MODEL_NAME = "baseline"
 
 VALID_MODELS = [
+
     "baseline",
+
     "kagn",
+
     "wavkan"
+
 ]
 
-assert MODEL_NAME in VALID_MODELS
+BATCH_SIZE = 64
 
-# =====================
-# CARICAMENTO DATI
-# =====================
+LEARNING_RATE = 0.003
 
-X = np.load("X_patches.npy")
+EPOCHS = 1
 
-y = np.load("y_patches.npy")
+INPUT_CHANNELS = 200
 
-print("Shape originale X:", X.shape)
+NUM_CLASSES = 16
 
-print("Shape originale y:", y.shape)
+LAYER_SIZES = [32,64,128,256]
 
 
 # =====================
-# RIORDINO DIMENSIONI
+# ARGOMENTO TERMINALE
 # =====================
 
-X = np.transpose(X, (0, 3, 1, 2))
+if len(sys.argv) > 1:
 
-print("\nNuova shape X:", X.shape)
+    MODEL_NAME = sys.argv[1].lower()
+
+if MODEL_NAME not in VALID_MODELS:
+
+    raise ValueError(
+
+        f"Modello non valido. Usa: {VALID_MODELS}"
+
+    )
 
 
+# =====================
+# SEED
+# =====================
 
 torch.manual_seed(42)
 
@@ -56,103 +77,18 @@ if torch.cuda.is_available():
 
     torch.cuda.manual_seed_all(42)
 
-# =====================
-# LABELS
-# =====================
-
-y = y - 1
 
 # =====================
-# TRAIN TEST SPLIT
+# DATALOADER
 # =====================
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.2,
-    random_state=42,
-    stratify=y
-)
+train_loader, test_loader = get_dataloaders(
 
-print("\nTrain:", X_train.shape)
+    batch_size=BATCH_SIZE
 
-print("Test:", X_test.shape)
-
-
-# =====================
-# NORMALIZZAZIONE
-# =====================
-
-N_train = X_train.shape[0]
-
-N_test = X_test.shape[0]
-
-X_train_flat = X_train.reshape(N_train, -1)
-
-X_test_flat = X_test.reshape(N_test, -1)
-
-scaler = StandardScaler()
-
-X_train_flat = scaler.fit_transform(X_train_flat)
-
-X_test_flat = scaler.transform(X_test_flat)
-
-X_train = X_train_flat.reshape(
-    N_train,
-    200,
-    9,
-    9
-)
-
-X_test = X_test_flat.reshape(
-    N_test,
-    200,
-    9,
-    9
-)
-
-# =====================
-# PYTORCH
-# =====================
-
-X_train = torch.tensor(X_train, dtype=torch.float32)
-
-X_test = torch.tensor(X_test, dtype=torch.float32)
-
-y_train = torch.tensor(y_train, dtype=torch.long)
-
-y_test = torch.tensor(y_test, dtype=torch.long)
-
-train_dataset = TensorDataset(
-    X_train,
-    y_train
-)
-
-test_dataset = TensorDataset(
-    X_test,
-    y_test
-)
-
-train_loader = DataLoader(
-    train_dataset,
-    batch_size=64,
-    shuffle=True
-)
-
-test_loader = DataLoader(
-    test_dataset,
-    batch_size=64,
-    shuffle=False
 )
 
 print("\nDataLoader creati.")
-
-
-
-
-
-
-    
 
 # =====================
 # DEVICE
@@ -166,17 +102,15 @@ print("\nDevice:", device)
 
 print("Torch:", torch.__version__)
 
-layer_sizes = [32,64,128,256]
-
 if MODEL_NAME == "baseline":
 
     model = SimpleConv(
 
-        layer_sizes=layer_sizes,
+        layer_sizes=LAYER_SIZES,
 
-        input_channels=200,
+        input_channels=INPUT_CHANNELS,
 
-        num_classes=16
+        num_classes=NUM_CLASSES
 
     )
 
@@ -184,11 +118,11 @@ elif MODEL_NAME == "kagn":
 
     model = SimpleConvKAGN(
 
-        layer_sizes=layer_sizes,
+        layer_sizes=LAYER_SIZES,
 
-        input_channels=200,
+        input_channels=INPUT_CHANNELS,
 
-        num_classes=16,
+        num_classes=NUM_CLASSES,
 
         degree=3
 
@@ -198,11 +132,11 @@ elif MODEL_NAME == "wavkan":
 
     model = SimpleConvWavKAN(
 
-        layer_sizes=layer_sizes,
+        layer_sizes=LAYER_SIZES,
 
-        input_channels=200,
+        input_channels=INPUT_CHANNELS,
 
-        num_classes=16,
+        num_classes=NUM_CLASSES,
 
         wavelet_type="mexican_hat"
 
@@ -230,13 +164,12 @@ criterion = nn.CrossEntropyLoss(
 )
 
 optimizer = torch.optim.Adam(
+
     model.parameters(),
-    lr=0.003
+
+    lr=LEARNING_RATE
+
 )
-
-epochs = 1
-
-best_accuracy = 0
 
 # =====================
 # TRAINING
@@ -312,7 +245,7 @@ print("\nAccuracy finale:")
 
 print(f"{accuracy*100:.2f}%")
 
-results_dir = Path(__file__).parent.parent / "results"
+results_dir = Path(__file__).parent / "results"
 
 results_dir.mkdir(exist_ok=True)
 
@@ -324,11 +257,11 @@ with open(results_dir / f"{MODEL_NAME}_results.txt", "w") as f:
 
     f.write(f"Accuracy: {accuracy*100:.2f}%\n")
 
-    f.write(f"Epoche: {epochs}\n")
+    f.write(f"Epoche: {EPOCHS}\n")
 
-    f.write("Batch size: 64\n")
+    f.write(f"Batch size: {BATCH_SIZE}\n")
 
-    f.write("Learning rate: 0.003\n")
+    f.write(f"Learning rate: {LEARNING_RATE}\n")
 
     f.write("Patch size: 9x9\n")
 

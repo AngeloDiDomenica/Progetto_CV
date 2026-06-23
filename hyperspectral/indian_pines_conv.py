@@ -7,8 +7,12 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision
 from torch.utils.data import DataLoader
-from torchvision.transforms import v2
-from torchvision.transforms.autoaugment import AutoAugmentPolicy
+# =====================
+# Modifica 1
+# =====================
+
+# from torchvision.transforms import v2
+# from torchvision.transforms.autoaugment import AutoAugmentPolicy
 from tqdm import tqdm
 
 from models import SimpleConvKALN, SimpleFastConvKAN, SimpleConvKAN, SimpleConv, EightSimpleConvKALN, \

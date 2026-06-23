@@ -124,3 +124,5 @@ Configurazione:
 
 Nota:
 Il train/test split è stato effettuato casualmente sui pixel, quindi il risultato potrebbe essere influenzato da spatial leakage.
+
+CNN custom: baseline preliminare sviluppata per verificare la pipeline di preprocessing del dataset Indian Pines. Il confronto ufficiale viene effettuato utilizzando le baseline del framework di Ivan Drokin (Vanilla, KAGN e WavKAN).

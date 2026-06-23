@@ -1,5 +1,8 @@
 from scipy.io import loadmat
 import numpy as np
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # =====================
 # PARAMETRI
@@ -12,8 +15,9 @@ HALF = PATCH_SIZE // 2
 # CARICAMENTO DATI
 # =====================
 
-data = loadmat("Indian_pines_corrected (1).mat")
-labels = loadmat("Indian_pines_gt.mat")
+data = loadmat(BASE_DIR / "Indian_pines_corrected (1).mat")
+
+labels = loadmat(BASE_DIR / "Indian_pines_gt.mat")
 
 X = data["indian_pines_corrected"]
 y = labels["indian_pines_gt"]
@@ -82,8 +86,8 @@ print("\nClasse prima patch:")
 print(y_patches[0])
 
 
-np.save("X_patches.npy", X_patches)
+np.save(BASE_DIR / "X_patches.npy", X_patches)
 
-np.save("y_patches.npy", y_patches)
+np.save(BASE_DIR / "y_patches.npy", y_patches)
 
 print("\nDataset salvato.")
