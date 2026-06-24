@@ -16,6 +16,8 @@ from models.baselines.conv_kagn_baseline import SimpleConvKAGN
 
 from models.baselines.conv_wavkan_baseline import SimpleConvWavKAN
 
+import csv
+
 
 # =====================
 # PARAMETRI
@@ -37,7 +39,7 @@ BATCH_SIZE = 64
 
 LEARNING_RATE = 0.003
 
-EPOCHS = 10
+EPOCHS = 1
 
 INPUT_CHANNELS = 200
 
@@ -171,6 +173,46 @@ optimizer = torch.optim.Adam(
 
 )
 
+print(optimizer)
+
+# =====================
+# CARTELLE OUTPUT
+# =====================
+
+results_dir = Path(__file__).parent / "results"
+
+results_dir.mkdir(exist_ok=True)
+
+logs_dir = Path(__file__).parent / "logs"
+
+logs_dir.mkdir(exist_ok=True)
+
+csv_file = logs_dir / f"{MODEL_NAME}_log.csv"
+
+# =====================
+# INIZIALIZZAZIONE CSV
+# =====================
+
+with open(csv_file, "w", newline="") as file:
+
+    writer = csv.writer(file)
+
+    writer.writerow(
+
+        [
+
+            "epoch",
+
+            "train_loss",
+
+            "train_accuracy",
+
+            "validation_accuracy"
+
+        ]
+
+    )
+
 # =====================
 # TRAINING
 # =====================
@@ -180,6 +222,10 @@ for epoch in range(EPOCHS):
     model.train()
 
     running_loss = 0
+
+    train_correct = 0
+
+    train_total = 0
 
     for batch_x, batch_y in train_loader:
 
@@ -202,11 +248,28 @@ for epoch in range(EPOCHS):
 
         running_loss += loss.item()
 
+        predictions = outputs.argmax(1)
+
+        train_total += batch_y.size(0)
+
+        train_correct += (
+
+            predictions == batch_y
+
+        ).sum().item()
+
     avg_loss = running_loss / len(train_loader)
 
+    train_accuracy = train_correct / train_total
+
     print(
+
         f"Epoch {epoch+1}/{EPOCHS}"
+
         f" Loss: {avg_loss:.4f}"
+
+        f" Train Accuracy: {train_accuracy*100:.2f}%"
+
     )
     
     # =====================
@@ -247,6 +310,26 @@ for epoch in range(EPOCHS):
 
     )
 
+    with open(csv_file, "a", newline="") as file:
+
+        writer = csv.writer(file)
+
+        writer.writerow(
+
+            [
+
+                epoch + 1,
+
+                avg_loss,
+
+                train_accuracy,
+
+                val_accuracy
+
+            ]
+
+        )
+
 # =====================
 # TEST
 # =====================
@@ -280,10 +363,6 @@ accuracy = correct / total
 print("\nAccuracy finale:")
 
 print(f"{accuracy*100:.2f}%")
-
-results_dir = Path(__file__).parent / "results"
-
-results_dir.mkdir(exist_ok=True)
 
 with open(results_dir / f"{MODEL_NAME}_results.txt", "w") as f:
 
