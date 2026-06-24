@@ -39,7 +39,7 @@ BATCH_SIZE = 64
 
 LEARNING_RATE = 0.003
 
-EPOCHS = 1
+EPOCHS = 50
 
 INPUT_CHANNELS = 200
 
@@ -189,6 +189,8 @@ logs_dir.mkdir(exist_ok=True)
 
 csv_file = logs_dir / f"{MODEL_NAME}_log.csv"
 
+txt_file = logs_dir / f"{MODEL_NAME}_log.txt"
+
 # =====================
 # INIZIALIZZAZIONE CSV
 # =====================
@@ -205,13 +207,17 @@ with open(csv_file, "w", newline="") as file:
 
             "train_loss",
 
-            "train_accuracy",
+            "train_accuracy_%",
 
-            "validation_accuracy"
+            "validation_accuracy_%"
 
         ]
 
     )
+
+with open(txt_file, "w") as file:
+
+    file.write(f"Modello: {MODEL_NAME}\n\n")
 
 # =====================
 # TRAINING
@@ -262,15 +268,11 @@ for epoch in range(EPOCHS):
 
     train_accuracy = train_correct / train_total
 
-    print(
-
-        f"Epoch {epoch+1}/{EPOCHS}"
-
-        f" Loss: {avg_loss:.4f}"
-
-        f" Train Accuracy: {train_accuracy*100:.2f}%"
-
-    )
+    #print(
+    #    f"Epoch {epoch+1}/{EPOCHS}"
+    #    f" Loss: {avg_loss:.4f}"
+    #    f" Train Accuracy: {train_accuracy*100:.2f}%"
+    #)
     
     # =====================
     # VALIDATION
@@ -303,12 +305,34 @@ for epoch in range(EPOCHS):
             ).sum().item()
 
     val_accuracy = val_correct / val_total
-
+    #print(
+    #    f"Validation Accuracy: {val_accuracy*100:.2f}%"
+    #)
     print(
 
-        f"Validation Accuracy: {val_accuracy*100:.2f}%"
+        f"Epoch {epoch+1}/{EPOCHS}"
+
+        f" | Loss: {avg_loss:.4f}"
+
+        f" | Train: {train_accuracy*100:.2f}%"
+
+        f" | Val: {val_accuracy*100:.2f}%"
 
     )
+
+    with open(txt_file, "a") as file:
+
+        file.write(
+
+            f"Epoch {epoch+1}/{EPOCHS}"
+
+            f" | Loss: {avg_loss:.4f}"
+
+            f" | Train: {train_accuracy*100:.2f}%"
+
+            f" | Val: {val_accuracy*100:.2f}%\n"
+
+        )
 
     with open(csv_file, "a", newline="") as file:
 
@@ -320,11 +344,11 @@ for epoch in range(EPOCHS):
 
                 epoch + 1,
 
-                avg_loss,
+                round(avg_loss,4),
 
-                train_accuracy,
+                round(train_accuracy*100,2),
 
-                val_accuracy
+                round(val_accuracy*100,2)
 
             ]
 
