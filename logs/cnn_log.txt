@@ -47,3 +47,6 @@ Epoch 44/50 | Loss: 0.5848 | Train: 99.96% | Val: 99.80%
 Epoch 45/50 | Loss: 0.5876 | Train: 99.85% | Val: 99.02%
 Epoch 46/50 | Loss: 0.6128 | Train: 99.32% | Val: 99.80%
 Epoch 47/50 | Loss: 0.5825 | Train: 99.99% | Val: 99.80%
+Epoch 48/50 | Loss: 0.5828 | Train: 99.93% | Val: 99.90%
+Epoch 49/50 | Loss: 0.5831 | Train: 99.93% | Val: 99.80%
+Epoch 50/50 | Loss: 0.5877 | Train: 99.89% | Val: 99.80%
