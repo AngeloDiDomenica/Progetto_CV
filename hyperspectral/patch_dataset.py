@@ -15,9 +15,11 @@ HALF = PATCH_SIZE // 2
 # CARICAMENTO DATI
 # =====================
 
-data = loadmat(BASE_DIR / "Indian_pines_corrected.mat")
+data = loadmat(BASE_DIR /".."/"proveHybrid"/"dataset"/"IndianPines"/"Indian_pines_corrected.mat")
+print(data)
 
-labels = loadmat(BASE_DIR / "Indian_pines_gt.mat")
+
+labels = loadmat(BASE_DIR /"Indian_pines_gt.mat")
 
 X = data["indian_pines_corrected"]
 y = labels["indian_pines_gt"]

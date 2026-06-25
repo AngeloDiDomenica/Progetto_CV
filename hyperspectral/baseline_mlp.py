@@ -13,7 +13,7 @@ from torch.utils.data import TensorDataset, DataLoader
 # CARICAMENTO DATI
 # =========================
 
-data = loadmat("Indian_pines_corrected (1).mat")
+data = loadmat("Indian_pines_corrected.mat")
 labels = loadmat("Indian_pines_gt.mat")
 
 X = data["indian_pines_corrected"]

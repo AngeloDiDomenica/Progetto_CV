@@ -30,17 +30,17 @@ from Kagn import KAGNConv3DLayerV2, KAGNConv2DLayerV2
 
 # ----------------------------- HYPERPARAMETERS -----------------------------
 RANDOM_SEED = 666
-DATASET = 'PU'          # Pavia University
+DATASET = 'IP'          # Pavia University
 TRAIN_RATE = 0.03       # <-- MODIFICATO (3%)
 VAL_RATE = 0.02         # <-- MODIFICATO (2%)
-EPOCH = 100             # <-- MODIFICATO
+EPOCH = 10             # <-- MODIFICATO
 VAL_EPOCH = 5
-LR = 0.0005             # <-- MODIFICATO
+LR = 0.003             # <-- MODIFICATO
 WEIGHT_DECAY = 1e-4     # <-- MODIFICATO
 BATCH_SIZE = 64         # <-- MODIFICATO
 DEVICE = 0              #-1=cpu, 0=cuda
 N_PCA = 15
-PATCH_SIZE = 15         # <-- MODIFICATO (Opzionale ma consigliato)
+PATCH_SIZE = 30         # <-- MODIFICATO (Opzionale ma consigliato)
 SAVE_PATH = os.path.join('results', DATASET)
 os.makedirs(SAVE_PATH, exist_ok=True)
 

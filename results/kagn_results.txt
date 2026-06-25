@@ -1,13 +1,13 @@
 Dataset: Indian Pines
 Modello: kagn
-Accuracy: 76.49%
-Epoche: 10
+Accuracy: 99.90%
+Epoche: 100
 Batch size: 64
 Learning rate: 0.003
 Patch size: 9x9
 Label smoothing: 0.1
 Seed: 42
-Device: cpu
+Device: cuda
 Parametri: 2244852
 
 Note:
