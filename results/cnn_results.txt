@@ -1,7 +1,7 @@
 Dataset: Indian Pines
 Modello: cnn
-Accuracy: 47.90%
-Epoche: 1
+Accuracy: 99.47%
+Epoche: 100
 Batch size: 64
 Learning rate: 0.003
 Patch size: 9x9

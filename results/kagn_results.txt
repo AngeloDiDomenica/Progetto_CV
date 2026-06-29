@@ -1,6 +1,6 @@
 Dataset: Indian Pines
 Modello: kagn
-Accuracy: 99.90%
+Accuracy: 99.51%
 Epoche: 100
 Batch size: 64
 Learning rate: 0.003
