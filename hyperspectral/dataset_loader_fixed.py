@@ -92,15 +92,38 @@ def get_dataloaders(batch_size=64):
     X_val   = _scale(X_val)
     X_test  = _scale(X_test)
 
-    def _loader(Xa, ya, shuffle):
+    def _loader(Xa, ya, shuffle, drop_last):
         ds = TensorDataset(
             torch.tensor(Xa, dtype=torch.float32),
             torch.tensor(ya, dtype=torch.long),
         )
-        return DataLoader(ds, batch_size=batch_size, shuffle=shuffle)
 
-    train_loader = _loader(X_train, y_train, shuffle=True)
-    val_loader   = _loader(X_val,   y_val,   shuffle=False)
-    test_loader  = _loader(X_test,  y_test,  shuffle=False)
+        return DataLoader(
+            ds,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            drop_last=drop_last
+        )
+
+    train_loader = _loader(
+        X_train,
+        y_train,
+        shuffle=True,
+        drop_last=True
+    )
+
+    val_loader = _loader(
+        X_val,
+        y_val,
+        shuffle=False,
+        drop_last=False
+    )
+
+    test_loader = _loader(
+        X_test,
+        y_test,
+        shuffle=False,
+        drop_last=False
+    )
 
     return train_loader, val_loader, test_loader

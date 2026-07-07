@@ -8,7 +8,7 @@ import torch.nn as nn
 
 from pathlib import Path
 
-from hyperspectral.dataset_loader import get_dataloaders
+from hyperspectral.dataset_loader_fixed import get_dataloaders
 
 from models.baselines.conv_baseline import SimpleConv
 
@@ -17,6 +17,8 @@ from models.baselines.conv_kagn_baseline import SimpleConvKAGN
 from models.baselines.conv_wavkan_baseline import SimpleConvWavKAN
 
 import csv
+
+from codecarbon import EmissionsTracker
 
 
 # =====================
@@ -187,6 +189,10 @@ logs_dir = Path(__file__).parent / "logs"
 
 logs_dir.mkdir(exist_ok=True)
 
+carbon_dir = Path(__file__).parent / "carbon_logs"
+
+carbon_dir.mkdir(exist_ok=True)
+
 csv_file = logs_dir / f"{MODEL_NAME}_log.csv"
 
 txt_file = logs_dir / f"{MODEL_NAME}_log.txt"
@@ -218,6 +224,22 @@ with open(csv_file, "w", newline="") as file:
 with open(txt_file, "w") as file:
 
     file.write(f"Modello: {MODEL_NAME}\n\n")
+
+# =====================
+# TRAINING TRACKER
+# =====================
+
+training_tracker = EmissionsTracker(
+
+    project_name=f"{MODEL_NAME}_training",
+
+    output_dir=carbon_dir,
+
+    output_file=f"{MODEL_NAME}_training.csv"
+
+)
+
+training_tracker.start()
 
 # =====================
 # TRAINING
@@ -355,6 +377,34 @@ for epoch in range(EPOCHS):
         )
 
 # =====================
+# FINE TRAINING TRACKER
+# =====================
+
+training_emissions = training_tracker.stop()
+
+print(
+
+    f"\nTraining CO2: {training_emissions:.8f} kg"
+
+)
+
+# =====================
+# TEST TRACKER
+# =====================
+
+testing_tracker = EmissionsTracker(
+
+    project_name=f"{MODEL_NAME}_testing",
+
+    output_dir=carbon_dir,
+
+    output_file=f"{MODEL_NAME}_testing.csv"
+
+)
+
+testing_tracker.start()
+
+# =====================
 # TEST
 # =====================
 
@@ -384,9 +434,51 @@ with torch.no_grad():
 
 accuracy = correct / total
 
+# =====================
+# FINE TEST TRACKER
+# =====================
+
+testing_emissions = testing_tracker.stop()
+
+print(
+
+    f"Testing CO2: {testing_emissions:.8f} kg"
+
+)
+
 print("\nAccuracy finale:")
 
 print(f"{accuracy*100:.2f}%")
+
+# =====================
+# AGGIUNTA CO2 AL CSV
+# =====================
+
+with open(csv_file, "a", newline="") as file:
+
+    writer = csv.writer(file)
+
+    writer.writerow([])
+
+    writer.writerow(
+        [
+            f"Training CO2: {testing_emissions:.8f} kg"
+        ]
+    )
+
+    writer.writerow(
+        [
+            f"Testing CO2: {testing_emissions:.8f} kg"
+        ]
+    )
+
+    writer.writerow(
+        [
+            f"Test Accuracy: {accuracy*100:.2f} %"
+        ]
+    )
+
+    writer.writerow([])
 
 with open(results_dir / f"{MODEL_NAME}_results.txt", "w") as f:
 
@@ -402,6 +494,8 @@ with open(results_dir / f"{MODEL_NAME}_results.txt", "w") as f:
 
     f.write(f"Learning rate: {LEARNING_RATE}\n")
 
+    f.write(f"Optimizer: {optimizer.__class__.__name__}\n")
+
     f.write("Patch size: 9x9\n")
 
     f.write("Label smoothing: 0.1\n")
@@ -411,6 +505,12 @@ with open(results_dir / f"{MODEL_NAME}_results.txt", "w") as f:
     f.write(f"Device: {device}\n")
 
     f.write(f"Parametri: {total_params}\n")
+
+    f.write("\nCarbon Footprint\n")
+
+    f.write(f"Training CO2: {training_emissions:.8f} kg\n")
+
+    f.write(f"Testing CO2: {testing_emissions:.8f} kg\n")
 
     f.write("\nNote:\n")
 
