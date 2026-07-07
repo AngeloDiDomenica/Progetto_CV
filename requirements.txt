@@ -21,3 +21,6 @@ ray[tune]
 medpy
 timm
 iterative-stratification
+numpy
+scipy
+codecarbon
