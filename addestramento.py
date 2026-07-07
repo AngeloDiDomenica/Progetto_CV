@@ -8,7 +8,7 @@ import torch.nn as nn
 
 from pathlib import Path
 
-from hyperspectral.dataset_loader_fixed import get_dataloaders
+from hyperspectral.dataset_loader import get_dataloaders
 
 from models.baselines.conv_baseline import SimpleConv
 
