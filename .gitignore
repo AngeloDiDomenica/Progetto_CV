@@ -162,11 +162,3 @@ cython_debug/
 data/
 experiments*/
 checkpoints/
-
-# =====================
-# Hyperspectral project
-# =====================
-
-# Generated patches
-hyperspectral/X_patches.npy
-hyperspectral/y_patches.npy
