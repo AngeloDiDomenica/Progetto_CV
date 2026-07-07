@@ -167,8 +167,6 @@ checkpoints/
 # Hyperspectral project
 # =====================
 
-# Original datasets
-hyperspectral/*.mat
 
 # Generated patches
 hyperspectral/X_patches.npy

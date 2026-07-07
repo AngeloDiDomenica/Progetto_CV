@@ -22,7 +22,7 @@ SEED = 42
 
 
 def _load():
-    data = loadmat(BASE_DIR / ".." / "proveHybrid" / "dataset" / "IndianPines" / "Indian_pines_corrected.mat")
+    data = loadmat(BASE_DIR / "Indian_pines_corrected.mat")
     gt   = loadmat(BASE_DIR / "Indian_pines_gt.mat")
     X = data["indian_pines_corrected"].astype(np.float32)
     y = gt["indian_pines_gt"].astype(np.int64)
