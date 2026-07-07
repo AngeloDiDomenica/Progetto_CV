@@ -1,14 +1,19 @@
 Dataset: Indian Pines
 Modello: cnn
-Accuracy: 99.47%
-Epoche: 100
+Accuracy: 90.30%
+Epoche: 10
 Batch size: 64
 Learning rate: 0.003
+Optimizer: Adam
 Patch size: 9x9
 Label smoothing: 0.1
 Seed: 42
-Device: cuda
+Device: cpu
 Parametri: 450224
+
+Carbon Footprint
+Training CO2: 0.00002360 kg
+Testing CO2: 0.00000310 kg
 
 Note:
 Split: 70% Train - 10% Validation - 20% Test.

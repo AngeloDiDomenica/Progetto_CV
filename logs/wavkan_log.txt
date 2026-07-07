@@ -1,2 +1,4 @@
 Modello: wavkan
 
+Epoch 1/10 | Loss: 1.8489 | Train: 53.52% | Val: 71.22%
+Epoch 2/10 | Loss: 1.2614 | Train: 80.27% | Val: 82.93%
