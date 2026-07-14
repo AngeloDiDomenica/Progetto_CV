@@ -41,13 +41,15 @@ BATCH_SIZE = 64
 
 LEARNING_RATE = 0.003
 
-EPOCHS = 100
+EPOCHS = 1
 
 INPUT_CHANNELS = 200
 
 NUM_CLASSES = 16
 
 LAYER_SIZES = [32,64,128,256]
+
+CNN_LAYER_SIZES = [72, 144, 288, 576]
 
 
 # =====================
@@ -110,7 +112,7 @@ if MODEL_NAME == "cnn":
 
     model = SimpleConv(
 
-        layer_sizes=LAYER_SIZES,
+        layer_sizes=CNN_LAYER_SIZES,
 
         input_channels=INPUT_CHANNELS,
 
