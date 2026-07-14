@@ -169,16 +169,6 @@ criterion = nn.CrossEntropyLoss(
     label_smoothing=0.1
 )
 
-optimizer = torch.optim.Adam(
-
-    model.parameters(),
-
-    lr=LEARNING_RATE
-
-)
-
-print(optimizer)
-
 # =====================
 # CARTELLE OUTPUT
 # =====================
@@ -198,6 +188,24 @@ carbon_dir.mkdir(exist_ok=True)
 csv_file = logs_dir / f"{MODEL_NAME}_log.csv"
 
 txt_file = logs_dir / f"{MODEL_NAME}_log.txt"
+
+optimizer = torch.optim.Adam(
+
+    model.parameters(),
+
+    lr=LEARNING_RATE
+
+)
+
+print(optimizer)
+
+# =====================
+# BEST MODEL
+# =====================
+
+best_val_accuracy = 0.0
+
+best_model_path = results_dir / f"{MODEL_NAME}_best.pth"
 
 # =====================
 # INIZIALIZZAZIONE CSV
@@ -329,9 +337,11 @@ for epoch in range(EPOCHS):
             ).sum().item()
 
     val_accuracy = val_correct / val_total
-    #print(
-    #    f"Validation Accuracy: {val_accuracy*100:.2f}%"
-    #)
+
+    if val_accuracy > best_val_accuracy:
+
+        best_val_accuracy = val_accuracy
+    
     print(
 
         f"Epoch {epoch+1}/{EPOCHS}"
@@ -464,7 +474,7 @@ with open(csv_file, "a", newline="") as file:
 
     writer.writerow(
         [
-            f"Training CO2: {testing_emissions:.8f} kg"
+            f"Training CO2: {training_emissions:.8f} kg"
         ]
     )
 
@@ -476,7 +486,7 @@ with open(csv_file, "a", newline="") as file:
 
     writer.writerow(
         [
-            f"Test Accuracy: {accuracy*100:.2f} %"
+            f"Best Validation Accuracy: {best_val_accuracy*100:.2f} %"
         ]
     )
 
