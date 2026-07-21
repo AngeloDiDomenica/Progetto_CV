@@ -1,19 +1,19 @@
-Dataset: Indian Pines
+Dataset: Pavia
 Modello: cnn
-Accuracy: 90.30%
-Epoche: 10
+Accuracy: 90.64%
+Epoche: 50
 Batch size: 64
 Learning rate: 0.003
 Optimizer: Adam
 Patch size: 9x9
 Label smoothing: 0.1
 Seed: 42
-Device: cpu
-Parametri: 450224
+Device: cuda
+Parametri: 2034729
 
 Carbon Footprint
-Training CO2: 0.00002360 kg
-Testing CO2: 0.00000310 kg
+Training CO2: 0.00037898 kg
+Testing CO2: 0.00000458 kg
 
 Note:
 Split: 70% Train - 10% Validation - 20% Test.
